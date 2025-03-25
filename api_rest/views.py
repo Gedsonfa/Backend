@@ -37,3 +37,28 @@ def get_by_titulo(request, titulo):
 
         serializer = TrefaSerializer(tarefa)
         return Response(serializer.data)
+
+#CRUD 
+@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+def tarefa_manager(request):
+
+    if request.method == 'GET':
+
+        try:
+            if request.GET['tarefa']:
+
+                tarefa_titulo = request.GET['tarefa']
+
+                try:
+                    tarefa = Tarefa.objects.get(pk=tarefa_titulo)
+                except:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                
+                serializer = TrefaSerializer(tarefa)
+                return Response(serializer.data)
+            
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
