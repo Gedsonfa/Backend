@@ -9,3 +9,9 @@ Sempre usar
 ~~~
 manage.py
 ~~~
+
+## Execução
+
+~~~
+python3 manage.py runserver
+~~~
