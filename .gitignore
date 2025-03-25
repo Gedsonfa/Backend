@@ -1,0 +1,46 @@
+# Python
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+*.swp
+*.swo
+*.log
+
+# Django
+*.sqlite3
+/db.sqlite3
+/media/
+staticfiles/
+.env
+*.env
+
+# Virtual Environment
+venv/
+.env/
+*.venv
+Pipfile
+Pipfile.lock
+
+# IDEs e editores
+.vscode/
+.idea/
+*.iml
+
+# Docker (se aplicável)
+*.log
+docker-compose.override.yml
+.dockerignore
+.env.docker
+
+# Postman/Insomnia
+*.postman_collection.json
+.insomnia/
+
+# Node.js (se estiver usando para frontend dentro do mesmo repositório)
+node_modules/
+package-lock.json
+yarn.lock
+
+# MD
+referencias.md
