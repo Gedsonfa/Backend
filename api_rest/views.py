@@ -5,9 +5,22 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import User
-from .serializers import UserSerializer
+from .models import Tarefa
+from .serializers import TrefaSerializer
 
 import json
 
 # Create your views here.
+
+@api_view(['GET'])
+def get_tarefas(request):
+
+    if request.method == 'GET':
+
+        tarefas = Tarefa.objects.all()
+
+        serializer = TrefaSerializer(tarefas, many=True)
+
+        return Response(serializer.data)
+    
+    return Response(status=status.HTTP_400_BAD_REQUEST)
