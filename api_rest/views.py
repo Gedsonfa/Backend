@@ -24,3 +24,16 @@ def get_tarefas(request):
         return Response(serializer.data)
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_by_titulo(request, titulo):
+
+    try: 
+        tarefa = Tarefa.objects.get(pk=titulo)
+    except:
+        return Response(sattus=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+
+        serializer = TrefaSerializer(tarefa)
+        return Response(serializer.data)
