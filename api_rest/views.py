@@ -104,3 +104,13 @@ def tarefa_manager(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    #DELETAR DADOS (DELETE)
+    if request.method == 'DELETE':
+        
+        try:
+            tarefa_to_delete = Tarefa.objects.get(pk=request.data['tarefa_titulo'])
+            tarefa_to_delete.delete()
+            return Response(status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
