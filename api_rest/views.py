@@ -75,3 +75,22 @@ def tarefa_manager(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    #EDITAR DADOS (PUT)
+    if request.method == 'PUT':
+
+        tarefa_titulo = request.data['tarefa_titulo']
+
+        try:    
+            update_tarefa = Tarefa.objects.get(pk=tarefa_titulo)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        print(request.data)
+
+        serializer = TrefaSerializer(update_tarefa, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

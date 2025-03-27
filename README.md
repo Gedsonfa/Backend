@@ -16,6 +16,9 @@ manage.py
 ~~~
 Sempre usar o interpretador na venv
 
-## Corrigir 
-Situação para
-(nova, em andamento, concluída ou cancelada). 
+Após modificar o models.py executar 
+
+~~~
+python3 manage.py makemigrations
+python3 manage.py migrate
+~~~
