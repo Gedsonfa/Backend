@@ -3,19 +3,19 @@ from django.db import models
 # Create your models here.
 
 class Situacao(models.TextChoices):
-    PENDENTE = "PEN", "Pendente"
-    APROVADO = "APR", "Aprovado"
-    REJEITADO = "REJ", "Rejeitado"
-    CANCELADO = "CAN", "Cancelado"
+    NOVA = "Nova", "Nova"
+    EM_ANDAMENTO = "Em andamento", "Em andamento"
+    CONCLUIDA = "Concluída", "Concluída"
+    CANCELADA = "Cancelada", "Cancelada"
 
 class Tarefa(models.Model):
 
     tarefa_titulo = models.CharField(primary_key=True, max_length=100, default='')
     tarefa_descricao = models.CharField(max_length=250, default='')
-    tarefa_prazo = models.DateField(default='')
-    tarefa_dataConclusao = models.DateField(default='')
+    tarefa_prazo = models.DateField(null=True, blank=True)
+    tarefa_dataConclusao = models.DateField(null=True, blank=True)
     tarefa_situacao = models.CharField(
-        max_length=3,
+        max_length=20,
         choices=Situacao.choices,
         default=''
     )

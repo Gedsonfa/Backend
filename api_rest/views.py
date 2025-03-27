@@ -62,3 +62,16 @@ def tarefa_manager(request):
             
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    # Criando dados
+    if request.method == 'POST':
+
+        new_tarefa = request.data
+
+        serializer = TrefaSerializer(data=new_tarefa)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(status=status.HTTP_400_BAD_REQUEST)
