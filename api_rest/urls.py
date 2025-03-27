@@ -4,7 +4,7 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('', views.get_tarefas, name='get_all_tarefas'),
+    path('', views.tarefa_list, name='tarefa_list'),
     path('tarefa/<str:titulo>', views.get_by_titulo),
     path('data/', views.tarefa_manager)
 ]

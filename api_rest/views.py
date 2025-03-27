@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from django.core.paginator import Paginator
+from django.shortcuts import render
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -114,3 +116,14 @@ def tarefa_manager(request):
             return Response(status=status.HTTP_202_ACCEPTED)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+def tarefa_list(request):
+    tarefa_list = Tarefa.objects.all()
+
+    paginator = Paginator(tarefa_list, 5) #numero de objetos por pag
+
+    page_number = request.GET.get('page')
+
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'list.html', {'page_obj' : page_obj})
