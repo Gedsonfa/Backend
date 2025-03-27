@@ -22,3 +22,5 @@ Após modificar o models.py executar
 python3 manage.py makemigrations
 python3 manage.py migrate
 ~~~
+
+o PUT não altera a primary key, caso tente, ele ira criar um novo objeto.

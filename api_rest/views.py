@@ -25,7 +25,8 @@ def get_tarefas(request):
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+#Metodos por URLs
+@api_view(['GET', 'PUT'])
 def get_by_titulo(request, titulo):
 
     try: 
@@ -37,7 +38,16 @@ def get_by_titulo(request, titulo):
 
         serializer = TrefaSerializer(tarefa)
         return Response(serializer.data)
+    
+    if request.method == 'PUT':
 
+        serializer = TrefaSerializer(tarefa, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 #CRUD 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def tarefa_manager(request):
