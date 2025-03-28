@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.shortcuts import render
+from django.db.models import Q
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -127,3 +128,14 @@ def tarefa_list(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'list.html', {'page_obj' : page_obj})
+
+def tarefa_search(request):
+    search = request.GET.get('search', '')  # Obtém o termo de busca
+    tarefas = Tarefa.objects.all()  # Busca todas as tarefas inicialmente
+
+    if search:
+        tarefas = tarefas.filter(
+            Q(tarefa_titulo__icontains=search) | Q(tarefa_descricao__icontains=search)
+        )
+
+    return render(request, "list.html", {"page_obj": tarefas, "search": search})

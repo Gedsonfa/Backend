@@ -4,29 +4,43 @@
 
 {% block content %}
 <h1>Tarefas</h1>
+
+<!-- 🔍 Formulário de Busca -->
+<form method="GET" action="{% url 'tarefa_search' %}" class="mb-3">
+    <div class="input-group">
+        <input type="text" name="search" value="{{ search|default:'' }}" class="form-control" placeholder="Digite o título ou descrição">
+        <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+    </div>
+</form>
+
+<!-- 📋 Tabela de Tarefas -->
 <div class="container"> 
-    <table class="table"> 
-        <thead>
-            <tr>
-                <th scope="col">Título</th>
-                <th scope="col">Descrição</th>
-                <th scope="col">Prazo</th>
-                <th scope="col">Data de Conclusão</th>
-                <th scope="col">Situação</th>
-            </tr>
-        </thead> 
-        <tbody>
-            {% for tarefa in page_obj %}
-            <tr>
-                <th scope="row">{{ tarefa.tarefa_titulo }}</th>
-                <th scope="row">{{ tarefa.tarefa_descricao }}</th>
-                <th scope="row">{{ tarefa.tarefa_prazo }}</th>
-                <th scope="row">{{ tarefa.tarefa_dataConclusao }}</th>
-                <th scope="row">{{ tarefa.tarefa_situacao }}</th>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table> 
-    {% include 'pagination.html' %} 
+    {% if page_obj %}
+        <table class="table"> 
+            <thead>
+                <tr>
+                    <th scope="col">Título</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Prazo</th>
+                    <th scope="col">Data de Conclusão</th>
+                    <th scope="col">Situação</th>
+                </tr>
+            </thead> 
+            <tbody>
+                {% for tarefa in page_obj %}
+                <tr>
+                    <th scope="row">{{ tarefa.tarefa_titulo }}</th>
+                    <th scope="row">{{ tarefa.tarefa_descricao }}</th>
+                    <th scope="row">{{ tarefa.tarefa_prazo }}</th>
+                    <th scope="row">{{ tarefa.tarefa_dataConclusao }}</th>
+                    <th scope="row">{{ tarefa.tarefa_situacao }}</th>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table> 
+    {% else %}
+        <p class="alert alert-warning">Nenhuma tarefa encontrada para "{{ search }}".</p>
+    {% endif %}
 </div> 
+
 {% endblock %}
