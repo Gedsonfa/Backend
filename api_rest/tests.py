@@ -103,3 +103,22 @@ class TarefaAPITestCase(APITestCase):
         self.assertEqual(self.objeto.tarefa_prazo, expected_date)  # Comparando com datetime.date
         self.assertEqual(self.objeto.tarefa_dataConclusao, expected_date)  # Comparando com datetime.date
         self.assertEqual(self.objeto.tarefa_situacao, "Nova")
+
+    #Exeção
+    def test_post_create_tarefa_sem_titulo(self):
+        # Dados para criar a tarefa, mas sem o campo 'tarefa_titulo'
+        data = {
+            "tarefa_descricao": "Descrição detalhada da tarefa",
+            "tarefa_prazo": "2025-03-28",
+            "tarefa_dataConclusao": "2025-03-28",
+            "tarefa_situacao": "Nova"
+        }
+
+        # Enviando a requisição POST
+        response = self.client.post(self.url_data, data, format="json")
+
+        # Verificando se a resposta é 400 Bad Request
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Verificando se a tarefa não foi criada no banco de dados
+        self.assertEqual(Tarefa.objects.count(), 0)
