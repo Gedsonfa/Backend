@@ -97,17 +97,18 @@ def tarefa_manager(request):
         except Tarefa.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        
+ # Função para listar todas as tarefas com paginação
 def tarefa_list(request):
-    tarefa_list = Tarefa.objects.all()
+    tarefa_list = Tarefa.objects.all()  # Pega todas as tarefas
 
-    paginator = Paginator(tarefa_list, 5) #numero de objetos por pag
+    paginator = Paginator(tarefa_list, 5)  # Define o número de tarefas por página
 
-    page_number = request.GET.get('page')
+    page_number = request.GET.get('page')  # Obtém o número da página da URL
+    page_obj = paginator.get_page(page_number)  # Pega o objeto da página
 
-    page_obj = paginator.get_page(page_number)
+    return render(request, 'list.html', {'page_obj': page_obj})
 
-    return render(request, 'list.html', {'page_obj' : page_obj})
+# Função para buscar tarefas com base no termo de busca
 def tarefa_search(request):
     search = request.GET.get('search', '')  # Obtém o termo de busca
     tarefas = Tarefa.objects.all()  # Busca todas as tarefas inicialmente
@@ -117,4 +118,8 @@ def tarefa_search(request):
             Q(tarefa_titulo__icontains=search) | Q(tarefa_descricao__icontains=search)
         )
 
-    return render(request, "list.html", {"page_obj": tarefas, "search": search})
+    paginator = Paginator(tarefas, 5)  # Define o número de tarefas por página
+    page_number = request.GET.get('page')  # Obtém o número da página da URL
+    page_obj = paginator.get_page(page_number)  # Pega o objeto da página
+
+    return render(request, "list.html", {"page_obj": page_obj, "search": search})

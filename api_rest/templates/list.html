@@ -43,4 +43,19 @@
     {% endif %}
 </div> 
 
+<!-- Paginação -->
+<div class="d-flex justify-content-center">
+    {% if page_obj.has_previous %}
+        <a href="?page=1&search={{ search }}" class="btn btn-outline-primary">Primeira</a>
+        <a href="?page={{ page_obj.previous_page_number }}&search={{ search }}" class="btn btn-outline-primary">Anterior</a>
+    {% endif %}
+
+    <span class="mx-2">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&search={{ search }}" class="btn btn-outline-primary">Próxima</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search }}" class="btn btn-outline-primary">Última</a>
+    {% endif %}
+</div>
+
 {% endblock %}
