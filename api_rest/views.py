@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.core.paginator import Paginator
-from django.shortcuts import render
 from django.db.models import Q
 
 from rest_framework.decorators import api_view
@@ -11,23 +10,17 @@ from rest_framework import status
 from .models import Tarefa
 from .serializers import TarefaSerializer
 
-import json
-
 # Create your views here.
 
 @api_view(['GET'])
 def get_tarefas(request):
-
     if request.method == 'GET':
-
         tarefas = Tarefa.objects.all()
         serializer = TarefaSerializer(tarefas, many=True)
-
         return Response(serializer.data)
-    
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#Metodos por URLs
+# Métodos por URLs 
 @api_view(['GET', 'PUT'])
 def get_by_titulo(request, titulo):
 
@@ -37,27 +30,24 @@ def get_by_titulo(request, titulo):
         return Response(sattus=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
-
         serializer = TarefaSerializer(tarefa)
         return Response(serializer.data)
     
     if request.method == 'PUT':
-
         serializer = TarefaSerializer(tarefa, data=request.data)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
         return Response(status=status.HTTP_400_BAD_REQUEST)
-#CRUD 
+
+# CRUD
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def tarefa_manager(request):
     if request.method == 'GET':
-        tarefa_titulo = request.GET.get('tarefa')  # Obter o título da tarefa
-        if tarefa_titulo:
+        tarefa_pk = request.GET.get('id')  # Obter o id da tarefa
+        if tarefa_pk:
             try:
-                tarefa = Tarefa.objects.get(tarefa_titulo=tarefa_titulo)
+                tarefa = Tarefa.objects.get(pk=tarefa_pk)
             except Tarefa.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             serializer = TarefaSerializer(tarefa)
@@ -76,9 +66,9 @@ def tarefa_manager(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'PUT':
-        tarefa_titulo = request.data.get('tarefa_titulo')
+        tarefa_pk = request.data.get('id')
         try:
-            tarefa = Tarefa.objects.get(tarefa_titulo=tarefa_titulo)
+            tarefa = Tarefa.objects.get(pk=tarefa_pk)
         except Tarefa.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -89,23 +79,20 @@ def tarefa_manager(request):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        tarefa_titulo = request.data.get('tarefa_titulo')
+        tarefa_pk = request.data.get('id')
         try:
-            tarefa = Tarefa.objects.get(tarefa_titulo=tarefa_titulo)
+            tarefa = Tarefa.objects.get(pk=tarefa_pk)
             tarefa.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Tarefa.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
- # Função para listar todas as tarefas com paginação
+# Função para listar todas as tarefas com paginação
 def tarefa_list(request):
     tarefa_list = Tarefa.objects.all()  # Pega todas as tarefas
-
     paginator = Paginator(tarefa_list, 5)  # Define o número de tarefas por página
-
     page_number = request.GET.get('page')  # Obtém o número da página da URL
     page_obj = paginator.get_page(page_number)  # Pega o objeto da página
-
     return render(request, 'list.html', {'page_obj': page_obj})
 
 # Função para buscar tarefas com base no termo de busca
@@ -123,3 +110,4 @@ def tarefa_search(request):
     page_obj = paginator.get_page(page_number)  # Pega o objeto da página
 
     return render(request, "list.html", {"page_obj": page_obj, "search": search})
+ 

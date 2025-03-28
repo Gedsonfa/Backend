@@ -19,6 +19,7 @@
         <table class="table"> 
             <thead>
                 <tr>
+                    <th scope="col">ID</th>
                     <th scope="col">Título</th>
                     <th scope="col">Descrição</th>
                     <th scope="col">Prazo</th>
@@ -29,6 +30,7 @@
             <tbody>
                 {% for tarefa in page_obj %}
                 <tr>
+                    <th scope="row">{{ tarefa.id }}</th>
                     <th scope="row">{{ tarefa.tarefa_titulo }}</th>
                     <th scope="row">{{ tarefa.tarefa_descricao }}</th>
                     <th scope="row">{{ tarefa.tarefa_prazo }}</th>

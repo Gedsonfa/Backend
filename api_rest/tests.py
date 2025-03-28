@@ -11,8 +11,10 @@ class TarefaAPITestCase(APITestCase):
             tarefa_titulo="Título da tarefa",  # Valor do título da tarefa
             tarefa_descricao="Descrição detalhada da tarefa"  # Valor da descrição
         )
+
         self.url_get = reverse('get_all_tarefas')  # URL para listar todas as tarefas
-        self.url_post = reverse('tarefa_data')  # URL para um recurso específico (detalhes)
+        self.url_data = reverse('tarefa_data')  # URL para um recurso específico (detalhes)
+
 
     def test_get_lista_tarefas(self):
         # Fazendo uma requisição GET para obter a lista de tarefas
@@ -39,7 +41,7 @@ class TarefaAPITestCase(APITestCase):
             "tarefa_dataConclusao": "2025-03-28",
             "tarefa_situacao": "Nova"
         }
-        response = self.client.post(self.url_post, data, format="json")
+        response = self.client.post(self.url_data, data, format="json")
 
         # Verificando se a resposta é 201 Created
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -50,3 +52,20 @@ class TarefaAPITestCase(APITestCase):
         self.assertEqual(response.data['tarefa_prazo'], "2025-03-28")
         self.assertEqual(response.data['tarefa_dataConclusao'], "2025-03-28")
         self.assertEqual(response.data['tarefa_situacao'], "Nova")
+
+    def test_delete_tarefa(self):
+        # URL genérica de exclusão (sem ID na URL)
+        url_delete = reverse('tarefa_data')
+
+        # Enviando DELETE com o ID no corpo da requisição
+        data = {"id": self.objeto.id}
+        response = self.client.delete(url_delete, data, format="json")
+
+        # Verificando se a resposta é 204 No Content (exclusão bem-sucedida)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Verificando se a tarefa foi realmente removida do banco de dados
+        self.assertFalse(Tarefa.objects.filter(id=self.objeto.id).exists())
+
+
+    
