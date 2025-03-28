@@ -20,25 +20,31 @@ def get_tarefas(request):
         return Response(serializer.data)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-# Métodos por URLs 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'PATCH'])
 def get_by_titulo(request, titulo):
 
     try: 
         tarefa = Tarefa.objects.get(tarefa_titulo=titulo)
-    except:
-        return Response(sattus=status.HTTP_404_NOT_FOUND)
-    
+    except Tarefa.DoesNotExist:
+        return Response({"error": "Tarefa não encontrada"}, status=status.HTTP_404_NOT_FOUND)  # 🔹 Corrigido status
+
     if request.method == 'GET':
         serializer = TarefaSerializer(tarefa)
         return Response(serializer.data)
-    
-    if request.method == 'PUT':
+
+    elif request.method == 'PUT':
         serializer = TarefaSerializer(tarefa, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':  # 🔹 Corrigido para incluir PATCH
+        serializer = TarefaSerializer(tarefa, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # CRUD
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
@@ -73,6 +79,19 @@ def tarefa_manager(request):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         serializer = TarefaSerializer(tarefa, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'PATCH':
+        tarefa_pk = request.data.get('id')
+        try:
+            tarefa = Tarefa.objects.get(pk=tarefa_pk)
+        except Tarefa.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = TarefaSerializer(tarefa, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

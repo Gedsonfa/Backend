@@ -1,7 +1,11 @@
 from django.urls import reverse
+
 from rest_framework.test import APITestCase
 from rest_framework import status
+
 from .models import Tarefa
+
+from datetime import datetime
 
 
 class TarefaAPITestCase(APITestCase):
@@ -15,6 +19,8 @@ class TarefaAPITestCase(APITestCase):
         self.url_get = reverse('get_all_tarefas')  # URL para listar todas as tarefas
         self.url_data = reverse('tarefa_data')  # URL para um recurso específico (detalhes)
 
+        # URL PATCH com o título da tarefa para atualizar
+        self.url_patch = reverse('tarefa_detail', args=[self.objeto.tarefa_titulo])
 
     def test_get_lista_tarefas(self):
         # Fazendo uma requisição GET para obter a lista de tarefas
@@ -67,5 +73,33 @@ class TarefaAPITestCase(APITestCase):
         # Verificando se a tarefa foi realmente removida do banco de dados
         self.assertFalse(Tarefa.objects.filter(id=self.objeto.id).exists())
 
+    def test_patch_update_tarefa(self):
+        # Dados para atualização parcial (todos os campos)
+        data = {
+            "tarefa_titulo": "Título da tarefa",  # Não modificando o título
+            "tarefa_descricao": "Nova descrição atualizada",  # Atualizando descrição
+            "tarefa_prazo": "2025-03-28",  # Garantir que o prazo não será alterado
+            "tarefa_dataConclusao": "2025-03-28",  # Garantir que a data de conclusão não será alterada
+            "tarefa_situacao": "Nova"  # Garantir que a situação não será alterada
+        }
 
-    
+        # Fazendo a requisição PATCH para atualizar a descrição da tarefa
+        response = self.client.patch(self.url_patch, data, format="json")
+
+        # Verificando se o status da resposta é 202 Accepted (sucesso na atualização)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+        # Obtendo a tarefa atualizada do banco de dados
+        self.objeto.refresh_from_db()
+
+        # Verificando se o campo 'tarefa_descricao' foi atualizado corretamente
+        self.assertEqual(self.objeto.tarefa_descricao, "Nova descrição atualizada")
+
+        # Convertendo a string para datetime.date para comparação
+        expected_date = datetime.strptime("2025-03-28", "%Y-%m-%d").date()
+
+        # Verificando se os outros campos não foram modificados
+        self.assertEqual(self.objeto.tarefa_titulo, "Título da tarefa")
+        self.assertEqual(self.objeto.tarefa_prazo, expected_date)  # Comparando com datetime.date
+        self.assertEqual(self.objeto.tarefa_dataConclusao, expected_date)  # Comparando com datetime.date
+        self.assertEqual(self.objeto.tarefa_situacao, "Nova")
