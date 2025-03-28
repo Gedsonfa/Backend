@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Tarefa
-from .serializers import TrefaSerializer
+from .serializers import TarefaSerializer
 
 import json
 
@@ -21,8 +21,7 @@ def get_tarefas(request):
     if request.method == 'GET':
 
         tarefas = Tarefa.objects.all()
-
-        serializer = TrefaSerializer(tarefas, many=True)
+        serializer = TarefaSerializer(tarefas, many=True)
 
         return Response(serializer.data)
     
@@ -33,18 +32,18 @@ def get_tarefas(request):
 def get_by_titulo(request, titulo):
 
     try: 
-        tarefa = Tarefa.objects.get(pk=titulo)
+        tarefa = Tarefa.objects.get(tarefa_titulo=titulo)
     except:
         return Response(sattus=status.HTTP_404_NOT_FOUND)
     
     if request.method == 'GET':
 
-        serializer = TrefaSerializer(tarefa)
+        serializer = TarefaSerializer(tarefa)
         return Response(serializer.data)
     
     if request.method == 'PUT':
 
-        serializer = TrefaSerializer(tarefa, data=request.data)
+        serializer = TarefaSerializer(tarefa, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -54,69 +53,50 @@ def get_by_titulo(request, titulo):
 #CRUD 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def tarefa_manager(request):
-
     if request.method == 'GET':
+        tarefa_titulo = request.GET.get('tarefa')  # Obter o título da tarefa
+        if tarefa_titulo:
+            try:
+                tarefa = Tarefa.objects.get(tarefa_titulo=tarefa_titulo)
+            except Tarefa.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            serializer = TarefaSerializer(tarefa)
+            return Response(serializer.data)
+        else:
+            tarefas = Tarefa.objects.all()
+            serializer = TarefaSerializer(tarefas, many=True)
+            return Response(serializer.data)
 
-        try:
-            if request.GET['tarefa']:
-
-                tarefa_titulo = request.GET['tarefa']
-
-                try:
-                    tarefa = Tarefa.objects.get(pk=tarefa_titulo)
-                except:
-                    return Response(status=status.HTTP_404_NOT_FOUND)
-                
-                serializer = TrefaSerializer(tarefa)
-                return Response(serializer.data)
-            
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-            
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    # Criando dados
-    if request.method == 'POST':
-
+    elif request.method == 'POST':
         new_tarefa = request.data
-
-        serializer = TrefaSerializer(data=new_tarefa)
-
+        serializer = TarefaSerializer(data=new_tarefa)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
-    #EDITAR DADOS (PUT)
-    if request.method == 'PUT':
 
-        tarefa_titulo = request.data['tarefa_titulo']
-
-        try:    
-            update_tarefa = Tarefa.objects.get(pk=tarefa_titulo)
-        except:
+    elif request.method == 'PUT':
+        tarefa_titulo = request.data.get('tarefa_titulo')
+        try:
+            tarefa = Tarefa.objects.get(tarefa_titulo=tarefa_titulo)
+        except Tarefa.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        
-        print(request.data)
 
-        serializer = TrefaSerializer(update_tarefa, data=request.data)
-
+        serializer = TarefaSerializer(tarefa, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
-    #DELETAR DADOS (DELETE)
-    if request.method == 'DELETE':
-        
+
+    elif request.method == 'DELETE':
+        tarefa_titulo = request.data.get('tarefa_titulo')
         try:
-            tarefa_to_delete = Tarefa.objects.get(pk=request.data['tarefa_titulo'])
-            tarefa_to_delete.delete()
-            return Response(status=status.HTTP_202_ACCEPTED)
-        except:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            tarefa = Tarefa.objects.get(tarefa_titulo=tarefa_titulo)
+            tarefa.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Tarefa.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         
 def tarefa_list(request):
     tarefa_list = Tarefa.objects.all()
@@ -128,7 +108,6 @@ def tarefa_list(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'list.html', {'page_obj' : page_obj})
-
 def tarefa_search(request):
     search = request.GET.get('search', '')  # Obtém o termo de busca
     tarefas = Tarefa.objects.all()  # Busca todas as tarefas inicialmente
